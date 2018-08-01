@@ -10,31 +10,23 @@ extra-source-files:
 - README.md
 - ChangeLog.md
 
-# Metadata used when publishing your package
-# synopsis:            Short description of your package
-# category:            Web
+synopsis:            Auth0 API Client
+category:            Web
 
-# To avoid duplicated efforts in documentation and dealing with the
-# complications of embedding Haddock markup inside cabal files, it is
-# common to point users to the README.md file.
 description:         Please see the README on GitHub at <https://github.com/dvekeman/auth0-client#readme>
 
 dependencies:
 - base >= 4.7 && < 5
+- aeson
+- bytestring
+- http-client
+- http-client-tls
+- servant
+- servant-client
+- text
 
 library:
   source-dirs: src
-
-executables:
-  auth0-client-exe:
-    main:                Main.hs
-    source-dirs:         app
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - auth0-client
 
 tests:
   auth0-client-test:
