@@ -22,7 +22,7 @@ dependencies:
 - http-client
 - http-client-tls
 - servant
-- servant-client
+- servant-client 
 - text
 
 library:
