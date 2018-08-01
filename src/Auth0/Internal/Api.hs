@@ -1,10 +1,12 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Auth0.Internal.Api where
 
 import           Data.Aeson
 import           Data.ByteString ( ByteString )
+import           Data.Monoid     ( (<>) )
 import           Data.Text       ( Text )
 import qualified Data.Text.Encoding as Enc8
 import           Data.Proxy
@@ -18,7 +20,7 @@ import           GHC.Generics
 type Token = Text 
 
 mkToken :: ByteString -> Token
-mkToken token = Enc8.decodeUtf8 token
+mkToken token = "Bearer " <> Enc8.decodeUtf8 token
 
 type Auth0Api = UserProfileApi
 
