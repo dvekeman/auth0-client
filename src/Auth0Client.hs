@@ -7,7 +7,7 @@ module Auth0Client
   -- * 
   , getUserInfo
   -- * /userinfo
-  , UserInfo
+  , UserInfo(..)
   , userinfo
    
   -- * Servant stuff
