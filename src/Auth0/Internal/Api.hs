@@ -5,6 +5,8 @@ module Auth0.Internal.Api where
 
 import           Data.Aeson
 import           Data.ByteString ( ByteString )
+import           Data.Text       ( Text )
+import qualified Data.Text.Encoding as Enc8
 import           Data.Proxy
 import           Servant.API
 import           Servant.Client
@@ -13,12 +15,10 @@ import           Auth0.Internal.Types.UserInfo
 
 import           GHC.Generics
 
-type Token = ByteString 
-
-instance ToHttpApiData ByteString
+type Token = Text 
 
 mkToken :: ByteString -> Token
-mkToken tok = tok
+mkToken token = Enc8.decodeUtf8 token
 
 type Auth0Api = UserProfileApi
 
