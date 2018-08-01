@@ -7,14 +7,14 @@ import           Data.Text ( Text )
 import           GHC.Generics
 
 data UserInfo = UserInfo
-  { email_verified :: Bool
-  , email          :: Text
+  { email_verified :: Maybe Bool
+  , email          :: Maybe Text
   , updated_at     :: Text
   , name           :: Text
   , picture        :: Text
-  , user_id        :: Text
+  , user_id        :: Maybe Text
   , nickname       :: Text
-  , created_at     :: Text
+  , created_at     :: Maybe Text
   , sub            :: Text
   } deriving (Eq, Show, Generic)
 
