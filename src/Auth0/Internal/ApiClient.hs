@@ -3,7 +3,7 @@ module Auth0.Internal.ApiClient where
 import qualified Data.ByteString as BS
 import           Network.HTTP.Client (newManager)
 import           Network.HTTP.Client.TLS (tlsManagerSettings)
-import           Servant.Client
+import           Servant.Client (runClientM, mkClientEnv, ServantError, Scheme(..), BaseUrl(..))
 
 import Auth0.Internal.Api
 import Auth0.Internal.Types.UserInfo
