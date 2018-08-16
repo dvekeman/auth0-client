@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
-module Auth0.Internal.Types.UserInfo where
+
+module Auth0.Internal.Types.Authentication.UserInfo where
 
 import           Data.Aeson
 import           Data.Text ( Text )

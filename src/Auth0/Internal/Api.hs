@@ -2,34 +2,27 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Auth0.Internal.Api where
+module Auth0.Internal.Api
+  ( module Auth0.Internal.Types
+  , module Servant.API
+  , module Servant.Client
+  , Auth0Api
+  , api
+  ) where
 
 import           Data.Aeson
-import           Data.ByteString ( ByteString )
-import           Data.Monoid     ( (<>) )
-import           Data.Text       ( Text )
-import qualified Data.Text.Encoding as Enc8
 import           Data.Proxy
 import           Servant.API
 import           Servant.Client
 
-import           Auth0.Internal.Types.UserInfo
+import           Auth0.Internal.AuthenticationApi
+import           Auth0.Internal.ManagementApi
+import           Auth0.Internal.Types
 
-import           GHC.Generics
-
-type Token = Text 
-
-mkToken :: ByteString -> Token
-mkToken token = "Bearer " <> Enc8.decodeUtf8 token
-
-type Auth0Api = UserProfileApi
-
-type UserProfileApi = 
-  Header "Authorization" Token :> "userinfo" :> Get '[JSON] UserInfo
+type Auth0Api = 
+  AuthenticationApi
+  :<|> ManagementApi
 
 api :: Proxy Auth0Api
 api = Proxy
-
-userinfo :: Maybe Token -> ClientM UserInfo
-userinfo = client api
 

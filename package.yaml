@@ -21,6 +21,7 @@ dependencies:
 - bytestring
 - http-client
 - http-client-tls
+- mtl
 - servant
 - servant-client 
 - text
@@ -38,3 +39,8 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - auth0-client
+
+default-extensions:
+- OverloadedStrings
+- RecordWildCards
+- DuplicateRecordFields
