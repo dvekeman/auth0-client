@@ -2,7 +2,8 @@
 
 module Auth0.Internal.Types.Management.ConnectionOptions where
 
-import           Data.Aeson (ToJSON, FromJSON)
+import           Data.Aeson (ToJSON, FromJSON, toJSON, parseJSON, genericToJSON, genericParseJSON, defaultOptions)
+import           Data.Aeson.Types (omitNothingFields)
 import           Data.Text (Text)
 
 import           GHC.Generics
@@ -18,25 +19,41 @@ data ConnectionOptions = ConnectionOptions
   , profile :: Maybe Bool
   , scope :: Maybe [Text]
   } deriving (Eq, Show, Generic)
-instance ToJSON ConnectionOptions
-instance FromJSON ConnectionOptions
+instance ToJSON ConnectionOptions where 
+  toJSON = genericToJSON defaultOptions
+    { omitNothingFields = True }
+instance FromJSON ConnectionOptions where
+  parseJSON = genericParseJSON defaultOptions
+    { omitNothingFields = True }
 
 data MultiFactorAuthentication = MultiFactorAuthentication
   { active :: Bool
   , return_enroll_settings :: Bool
   } deriving (Eq, Show, Generic)
-instance ToJSON MultiFactorAuthentication
-instance FromJSON MultiFactorAuthentication
+instance ToJSON MultiFactorAuthentication where 
+  toJSON = genericToJSON defaultOptions
+    { omitNothingFields = True }
+instance FromJSON MultiFactorAuthentication where
+  parseJSON = genericParseJSON defaultOptions
+    { omitNothingFields = True }
 
 data Validation = Validation 
   { username :: Maybe UsernameValidation
   } deriving (Eq, Show, Generic)
-instance ToJSON Validation
-instance FromJSON Validation
+instance ToJSON Validation where 
+  toJSON = genericToJSON defaultOptions
+    { omitNothingFields = True }
+instance FromJSON Validation where
+  parseJSON = genericParseJSON defaultOptions
+    { omitNothingFields = True }
 
 data UsernameValidation = UsernameValidation
   { min :: Int
   , max :: Int
   } deriving (Eq, Show, Generic)
-instance ToJSON UsernameValidation
-instance FromJSON UsernameValidation
+instance ToJSON UsernameValidation where 
+  toJSON = genericToJSON defaultOptions
+    { omitNothingFields = True }
+instance FromJSON UsernameValidation where
+  parseJSON = genericParseJSON defaultOptions
+    { omitNothingFields = True }

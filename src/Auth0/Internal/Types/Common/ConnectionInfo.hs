@@ -1,11 +1,8 @@
 module Auth0.Internal.Types.Common.ConnectionInfo where
 
-import           Data.Aeson (ToJSON, FromJSON)
 import           Data.ByteString (ByteString)
 import           Data.Text (Text)
 import           Servant.Client (Scheme(..))
-
-import           GHC.Generics
 
 data ConnectionInfo = ConnectionInfo
   { cDomain :: Text

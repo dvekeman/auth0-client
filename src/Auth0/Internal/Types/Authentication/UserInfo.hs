@@ -2,7 +2,8 @@
 
 module Auth0.Internal.Types.Authentication.UserInfo where
 
-import           Data.Aeson
+import           Data.Aeson (ToJSON, FromJSON, toJSON, parseJSON, genericToJSON, genericParseJSON, defaultOptions)
+import           Data.Aeson.Types (omitNothingFields)
 import           Data.Text ( Text )
 
 import           GHC.Generics
@@ -19,5 +20,9 @@ data UserInfo = UserInfo
   , sub            :: Text
   } deriving (Eq, Show, Generic)
 
-instance FromJSON UserInfo
-instance ToJSON   UserInfo
+instance ToJSON UserInfo where 
+  toJSON = genericToJSON defaultOptions
+    { omitNothingFields = True }
+instance FromJSON UserInfo where
+  parseJSON = genericParseJSON defaultOptions
+    { omitNothingFields = True }

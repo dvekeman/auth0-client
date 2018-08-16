@@ -2,7 +2,8 @@
 
 module Auth0.Internal.Types.Management.ClientToken where
 
-import           Data.Aeson (ToJSON, FromJSON)
+import           Data.Aeson (ToJSON, FromJSON, toJSON, parseJSON, genericToJSON, genericParseJSON, defaultOptions)
+import           Data.Aeson.Types (omitNothingFields)
 import qualified Data.ByteString as BS
 import           Data.Text (Text)
 import qualified Data.Text.Encoding as Enc8
@@ -15,8 +16,12 @@ data ClientToken = ClientToken
   , expires_in   :: Int
   , token_type   :: Text
   } deriving (Eq, Show, Generic)
-instance ToJSON ClientToken
-instance FromJSON ClientToken
+instance ToJSON ClientToken where 
+  toJSON = genericToJSON defaultOptions
+    { omitNothingFields = True }
+instance FromJSON ClientToken where
+  parseJSON = genericParseJSON defaultOptions
+    { omitNothingFields = True }
 
 mkClientToken :: Text -> Text -> Int -> Text -> ClientToken
 mkClientToken = ClientToken

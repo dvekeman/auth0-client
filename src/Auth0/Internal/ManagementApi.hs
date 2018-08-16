@@ -5,6 +5,7 @@
 
 module Auth0.Internal.ManagementApi where
 
+import           Data.Text (Text)
 import           Servant.API
 
 import           Auth0.Internal.Types
@@ -22,3 +23,6 @@ type UsersApi =
   Header "Authorization" Token :> "api" :> "v2" :> "users" :> Get '[JSON] [User] 
   -- POST /api/v2/users Create a user
   :<|> Header "Authorization" Token :> "api" :> "v2" :> "users" :> ReqBody '[JSON] PostUserBody :> Post '[JSON] User   
+  -- PATCH /api/v2/users/{id} Update a user
+  :<|> Header "Authorization" Token :> "api" :> "v2" :> "users" :> Capture "id" Text:> ReqBody '[JSON] PatchUserBody :> Patch '[JSON] User
+  

@@ -2,7 +2,8 @@
 
 module Auth0.Internal.Types.Management.User where
 
-import           Data.Aeson (ToJSON, FromJSON)
+import           Data.Aeson (ToJSON, FromJSON, toJSON, parseJSON, genericToJSON, genericParseJSON, defaultOptions)
+import           Data.Aeson.Types (omitNothingFields)
 import           Data.Text (Text)
 
 import qualified Auth0.Internal.Types.Management.UserIdentity as I
@@ -34,12 +35,9 @@ data User = User
   , given_name :: Maybe String
   , family_name :: Maybe String
   } deriving (Eq, Show, Generic)
-instance ToJSON User
-instance FromJSON User
-  
-data Identity = Identity 
-  { 
-  } deriving (Eq, Show, Generic)
-instance ToJSON Identity
-instance FromJSON Identity
-
+instance ToJSON User where 
+  toJSON = genericToJSON defaultOptions
+    { omitNothingFields = True }
+instance FromJSON User where
+  parseJSON = genericParseJSON defaultOptions
+    { omitNothingFields = True }

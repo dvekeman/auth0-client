@@ -14,7 +14,7 @@ import qualified Auth0.Internal.Types.Management.ClientToken as CT
 
 -- * Authentication API
 -- -- * Authorization API
-doRequestClientToken :: ClientCredentialsRequest -> ClientM ClientToken
+doPostClientToken :: ClientCredentialsRequest -> ClientM ClientToken
 -- -- * UserProfile API
 doGetUserinfo :: Maybe Token -> ClientM UserInfo
 -- * Management API
@@ -23,8 +23,11 @@ doGetConnections :: Maybe Token -> ClientM [Connection]
 -- -- * Users API
 doGetUsers :: Maybe Token -> ClientM [User]
 doPostUser :: Maybe Token -> PostUserBody -> ClientM User
+doPatchUser :: Maybe Token -> Text -> PatchUserBody -> ClientM User
 -- -- * Authorization API
-( doRequestClientToken :<|> doGetUserinfo ) :<|> ( doGetConnections :<|> doGetUsers :<|> doPostUser ) = client api
+( doPostClientToken :<|> doGetUserinfo ) 
+ :<|> ( doGetConnections :<|> doGetUsers :<|> doPostUser :<|> doPatchUser ) = 
+  client api
 
 type AccessToken = BS.ByteString
 type Auth0ApiResponse a = IO (Either ServantError a)
@@ -41,11 +44,15 @@ getUsers token = do
   let authToken = Just $ mkToken token
   runClientM (doGetUsers authToken) (ClientEnv manager' (BaseUrl Https "hadruki.eu.auth0.com" 443 ""))
 
-postUser :: AccessToken -> PostUserBody -> Auth0ApiResponse User
-postUser token body = do
+createUser :: AccessToken -> PostUserBody -> Auth0ApiResponse User
+createUser token body = do
   manager' <- newManager tlsManagerSettings
   let authToken = Just $ mkToken token
   runClientM (doPostUser authToken body) (ClientEnv manager' (BaseUrl Https "hadruki.eu.auth0.com" 443 ""))
+
+updateUser :: Text -> AccessToken -> Text -> PatchUserBody -> Auth0ApiResponse User
+updateUser domain token userId body = do 
+  withToken (defaultConnectionInfo domain) token (\mToken -> doPatchUser mToken userId body)
 
 -- * Authentication API
 -- -- * Authentication > Authorization API
@@ -56,7 +63,7 @@ requestClientToken :: ConnectionInfo -> Auth0ApiResponse ClientToken
 requestClientToken ConnectionInfo{..} = do 
   manager' <- newManager tlsManagerSettings
   let clientCreds = defaultClientCredentialsRequest (Enc8.decodeUtf8 cClientId) (Enc8.decodeUtf8 cClientSecret) ("https://" <> cDomain <> "/api/v2/")
-  runClientM (doRequestClientToken clientCreds) (ClientEnv manager' (BaseUrl Https (T.unpack cDomain) 443 ""))
+  runClientM (doPostClientToken clientCreds) (ClientEnv manager' (BaseUrl Https (T.unpack cDomain) 443 ""))
 
 -- -- * Authentication > Profile API
 getUserInfo :: ClientToken -> IO (Either ServantError UserInfo)
