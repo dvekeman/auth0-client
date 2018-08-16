@@ -14,6 +14,7 @@ import Auth0.Internal.ApiClient
   , getUsers
   , createUser
   , updateUser
+  , deleteUser
   -- * Authentication API
   -- -- * Authorization
   , requestClientToken

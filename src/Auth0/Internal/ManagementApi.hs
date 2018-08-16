@@ -24,5 +24,6 @@ type UsersApi =
   -- POST /api/v2/users Create a user
   :<|> Header "Authorization" Token :> "api" :> "v2" :> "users" :> ReqBody '[JSON] PostUserBody :> Post '[JSON] User   
   -- PATCH /api/v2/users/{id} Update a user
-  :<|> Header "Authorization" Token :> "api" :> "v2" :> "users" :> Capture "id" Text:> ReqBody '[JSON] PatchUserBody :> Patch '[JSON] User
-  
+  :<|> Header "Authorization" Token :> "api" :> "v2" :> "users" :> Capture "id" Text :> ReqBody '[JSON] PatchUserBody :> Patch '[JSON] User
+  -- DELETE /api/v2/users/{id} Delete a user
+  :<|> Header "Authorization" Token :> "api" :> "v2" :> "users" :> Capture "id" Text :> Delete '[JSON] ()

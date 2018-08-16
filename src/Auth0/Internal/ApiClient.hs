@@ -24,10 +24,16 @@ doGetConnections :: Maybe Token -> ClientM [Connection]
 doGetUsers :: Maybe Token -> ClientM [User]
 doPostUser :: Maybe Token -> PostUserBody -> ClientM User
 doPatchUser :: Maybe Token -> Text -> PatchUserBody -> ClientM User
--- -- * Authorization API
-( doPostClientToken :<|> doGetUserinfo ) 
- :<|> ( doGetConnections :<|> doGetUsers :<|> doPostUser :<|> doPatchUser ) = 
-  client api
+doDeleteUser :: Maybe Token -> Text -> ClientM ()
+( 
+  -- -- * Authorization API
+  ( doPostClientToken :<|> doGetUserinfo ) 
+  :<|> 
+  -- -- * Management API
+  ( 
+   ( doGetConnections :<|> doGetUsers :<|> doPostUser :<|> doPatchUser :<|> doDeleteUser )
+  ) 
+ ) = client api
 
 type AccessToken = BS.ByteString
 type Auth0ApiResponse a = IO (Either ServantError a)
@@ -38,21 +44,21 @@ getConnections :: Text -> AccessToken -> Auth0ApiResponse [Connection]
 getConnections domain token = withToken (defaultConnectionInfo domain) token doGetConnections 
 
 -- -- * Management > Users API
-getUsers :: AccessToken -> Auth0ApiResponse [User]
-getUsers token = do
-  manager' <- newManager tlsManagerSettings
-  let authToken = Just $ mkToken token
-  runClientM (doGetUsers authToken) (ClientEnv manager' (BaseUrl Https "hadruki.eu.auth0.com" 443 ""))
+getUsers :: Text -> AccessToken -> Auth0ApiResponse [User]
+getUsers domain token =
+  withToken (defaultConnectionInfo domain) token (\mToken -> doGetUsers mToken)
 
-createUser :: AccessToken -> PostUserBody -> Auth0ApiResponse User
-createUser token body = do
-  manager' <- newManager tlsManagerSettings
-  let authToken = Just $ mkToken token
-  runClientM (doPostUser authToken body) (ClientEnv manager' (BaseUrl Https "hadruki.eu.auth0.com" 443 ""))
+createUser :: Text -> AccessToken -> PostUserBody -> Auth0ApiResponse User
+createUser domain token body =
+  withToken (defaultConnectionInfo domain) token (\mToken -> doPostUser mToken body)
 
 updateUser :: Text -> AccessToken -> Text -> PatchUserBody -> Auth0ApiResponse User
-updateUser domain token userId body = do 
+updateUser domain token userId body =
   withToken (defaultConnectionInfo domain) token (\mToken -> doPatchUser mToken userId body)
+
+deleteUser :: Text -> AccessToken -> Text -> Auth0ApiResponse ()
+deleteUser domain token userId = 
+  withToken (defaultConnectionInfo domain) token (\mToken -> doDeleteUser mToken userId)
 
 -- * Authentication API
 -- -- * Authentication > Authorization API
@@ -66,14 +72,12 @@ requestClientToken ConnectionInfo{..} = do
   runClientM (doPostClientToken clientCreds) (ClientEnv manager' (BaseUrl Https (T.unpack cDomain) 443 ""))
 
 -- -- * Authentication > Profile API
-getUserInfo :: ClientToken -> IO (Either ServantError UserInfo)
-getUserInfo CT.ClientToken{..} = getUserInfo' (Enc8.encodeUtf8 access_token)
+getUserInfo :: Text -> ClientToken -> IO (Either ServantError UserInfo)
+getUserInfo domain CT.ClientToken{..} = getUserInfo' domain (Enc8.encodeUtf8 access_token)
 
-getUserInfo' :: BS.ByteString -> IO (Either ServantError UserInfo)
-getUserInfo' token = do
-  manager' <- newManager tlsManagerSettings
-  let authToken = Just $ mkToken token
-  runClientM (doGetUserinfo authToken) (ClientEnv manager' (BaseUrl Https "hadruki.eu.auth0.com" 443 ""))
+getUserInfo' :: Text -> BS.ByteString -> IO (Either ServantError UserInfo)
+getUserInfo' domain token = 
+  withToken (defaultConnectionInfo domain) token (\mToken -> doGetUserinfo mToken)
 
 
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --
