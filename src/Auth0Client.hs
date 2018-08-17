@@ -19,6 +19,6 @@ import Auth0.Internal.ApiClient
   -- -- * Authorization
   , requestClientToken
   -- -- * Profile
-  , getUserInfo, getUserInfo'
+  , getUserInfo
   )
 import Auth0.Internal.Types

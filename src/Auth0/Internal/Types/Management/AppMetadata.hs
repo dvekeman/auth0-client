@@ -9,7 +9,7 @@ import           Data.Text (Text)
 import           GHC.Generics
 
 data AppMetadata = AppMetadata
-  { app_id :: Text
+  { app_id :: Maybe Text
   } deriving (Eq, Show, Generic)
 instance ToJSON AppMetadata where 
   toJSON = genericToJSON defaultOptions

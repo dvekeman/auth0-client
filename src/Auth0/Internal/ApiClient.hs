@@ -72,13 +72,9 @@ requestClientToken ConnectionInfo{..} = do
   runClientM (doPostClientToken clientCreds) (ClientEnv manager' (BaseUrl Https (T.unpack cDomain) 443 ""))
 
 -- -- * Authentication > Profile API
-getUserInfo :: Text -> ClientToken -> IO (Either ServantError UserInfo)
-getUserInfo domain CT.ClientToken{..} = getUserInfo' domain (Enc8.encodeUtf8 access_token)
-
-getUserInfo' :: Text -> BS.ByteString -> IO (Either ServantError UserInfo)
-getUserInfo' domain token = 
+getUserInfo :: Text -> AccessToken -> IO (Either ServantError UserInfo)
+getUserInfo domain token =  
   withToken (defaultConnectionInfo domain) token (\mToken -> doGetUserinfo mToken)
-
 
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --
 -- Helper
