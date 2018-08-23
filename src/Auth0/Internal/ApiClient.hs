@@ -22,6 +22,7 @@ doGetUserinfo :: Maybe Token -> ClientM UserInfo
 doGetConnections :: Maybe Token -> ClientM [Connection]
 -- -- * Users API
 doGetUsers :: Maybe Token -> ClientM [User]
+doGetUser :: Maybe Token -> Text -> ClientM User
 doPostUser :: Maybe Token -> PostUserBody -> ClientM User
 doPatchUser :: Maybe Token -> Text -> PatchUserBody -> ClientM User
 doDeleteUser :: Maybe Token -> Text -> ClientM ()
@@ -31,7 +32,7 @@ doDeleteUser :: Maybe Token -> Text -> ClientM ()
   :<|> 
   -- -- * Management API
   ( 
-   ( doGetConnections :<|> doGetUsers :<|> doPostUser :<|> doPatchUser :<|> doDeleteUser )
+   ( doGetConnections :<|> doGetUsers :<|> doGetUser :<|> doPostUser :<|> doPatchUser :<|> doDeleteUser )
   ) 
  ) = client api
 
@@ -46,7 +47,11 @@ getConnections domain token = withToken (defaultConnectionInfo domain) token doG
 -- -- * Management > Users API
 getUsers :: Text -> AccessToken -> Auth0ApiResponse [User]
 getUsers domain token =
-  withToken (defaultConnectionInfo domain) token (\mToken -> doGetUsers mToken)
+  withToken (defaultConnectionInfo domain) token doGetUsers
+
+getUser :: Text -> AccessToken -> Text -> Auth0ApiResponse User
+getUser domain token userId = 
+  withToken (defaultConnectionInfo domain) token (\mToken -> doGetUser mToken userId)
 
 createUser :: Text -> AccessToken -> PostUserBody -> Auth0ApiResponse User
 createUser domain token body =

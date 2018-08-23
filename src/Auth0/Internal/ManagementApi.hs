@@ -21,6 +21,8 @@ type ConnectionApi =
 type UsersApi = 
   -- GET /api/v2/users List or search users
   Header "Authorization" Token :> "api" :> "v2" :> "users" :> Get '[JSON] [User] 
+  -- GET /api/v2/user/{id} Get a user
+  :<|> Header "Authorization" Token :> "api" :> "v2" :> "users" :> Capture "id" Text :> Get '[JSON] User 
   -- POST /api/v2/users Create a user
   :<|> Header "Authorization" Token :> "api" :> "v2" :> "users" :> ReqBody '[JSON] PostUserBody :> Post '[JSON] User   
   -- PATCH /api/v2/users/{id} Update a user

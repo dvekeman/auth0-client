@@ -12,6 +12,7 @@ import Auth0.Internal.ApiClient
   , getConnections
   -- -- * Users
   , getUsers
+  , getUser
   , createUser
   , updateUser
   , deleteUser

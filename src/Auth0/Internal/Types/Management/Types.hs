@@ -10,9 +10,9 @@ module Auth0.Internal.Types.Management.Types
   ) where
 
 import Auth0.Internal.Types.Management.ClientCredentialsRequest (ClientCredentialsRequest, defaultClientCredentialsRequest)
-import Auth0.Internal.Types.Management.ClientToken (ClientToken, mkClientToken, accessToken)
+import Auth0.Internal.Types.Management.ClientToken (ClientToken(..), mkClientToken, accessToken)
 import Auth0.Internal.Types.Management.Connection (Connection)
-import Auth0.Internal.Types.Management.User (User)
+import Auth0.Internal.Types.Management.User (User(..))
 import Auth0.Internal.Types.Management.PatchUserBody (PatchUserBody(..), defaultPatchUserBody)
 import Auth0.Internal.Types.Management.PostUserBody (PostUserBody(..), defaultPostUserBody)
 import Auth0.Internal.Types.Management.AppMetadata (AppMetadata(..))
