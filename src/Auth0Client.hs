@@ -18,7 +18,11 @@ import Auth0.Internal.ApiClient
   , deleteUser
   -- * Authentication API
   -- -- * Authorization
-  , requestClientToken
+  , requestClientCredentialsToken
+  , requestAuthorizationToken
+  -- -- * Authorization Extension
+  , getAllRoles
+  , addRoles
   -- -- * Profile
   , getUserInfo
   )

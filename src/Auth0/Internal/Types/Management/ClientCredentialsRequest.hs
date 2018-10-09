@@ -10,6 +10,7 @@ import           GHC.Generics
 
 data ClientCredentialsRequest = ClientCredentialsRequest 
   { grant_type :: Text
+  , redirect_uri :: Maybe Text
   , client_id  :: Text -- Ideally ByteString (no ToJSON)
   , client_secret :: Text -- Ideally ByteString (no ToJSON)
   , audience :: Text
@@ -21,5 +22,8 @@ instance FromJSON ClientCredentialsRequest where
   parseJSON = genericParseJSON defaultOptions
     { omitNothingFields = True }
 
-defaultClientCredentialsRequest :: Text -> Text -> Text -> ClientCredentialsRequest
-defaultClientCredentialsRequest = ClientCredentialsRequest "client_credentials"
+mkClientCredentialsRequest :: Text -> Text -> Text -> ClientCredentialsRequest
+mkClientCredentialsRequest = ClientCredentialsRequest "client_credentials" Nothing
+
+mkAuthorizationCodeRequest :: Text -> Text -> Text -> Text -> ClientCredentialsRequest
+mkAuthorizationCodeRequest redirectUrl = ClientCredentialsRequest "authorization_code" (Just redirectUrl)

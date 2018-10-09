@@ -9,7 +9,7 @@ module Auth0.Internal.Types.Management.Types
   , module Auth0.Internal.Types.Management.UserMetadata
   ) where
 
-import Auth0.Internal.Types.Management.ClientCredentialsRequest (ClientCredentialsRequest, defaultClientCredentialsRequest)
+import Auth0.Internal.Types.Management.ClientCredentialsRequest (ClientCredentialsRequest, mkClientCredentialsRequest, mkAuthorizationCodeRequest)
 import Auth0.Internal.Types.Management.ClientToken (ClientToken(..), mkClientToken, accessToken)
 import Auth0.Internal.Types.Management.Connection (Connection)
 import Auth0.Internal.Types.Management.User (User(..))

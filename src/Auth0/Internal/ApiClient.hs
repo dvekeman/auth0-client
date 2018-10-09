@@ -10,11 +10,14 @@ import           Network.HTTP.Client.TLS (tlsManagerSettings)
 import           Servant.Client (runClientM, ClientEnv(..), ServantError, Scheme(..), BaseUrl(..))
 
 import           Auth0.Internal.Api
-import qualified Auth0.Internal.Types.Management.ClientToken as CT
 
 -- * Authentication API
 -- -- * Authorization API
 doPostClientToken :: ClientCredentialsRequest -> ClientM ClientToken
+-- doAuthorize :: Text -> Text -> Text -> Text -> ClientM 
+-- -- * Authorization Extension API
+doGetAllRoles :: Maybe Token -> ClientM Roles
+doPatchUserRoles :: Maybe Token -> Text -> PatchUserRolesBody -> ClientM ()
 -- -- * UserProfile API
 doGetUserinfo :: Maybe Token -> ClientM UserInfo
 -- * Management API
@@ -28,7 +31,15 @@ doPatchUser :: Maybe Token -> Text -> PatchUserBody -> ClientM User
 doDeleteUser :: Maybe Token -> Text -> ClientM ()
 ( 
   -- -- * Authorization API
-  ( doPostClientToken :<|> doGetUserinfo ) 
+  ( doPostClientToken
+  -- -- * Authorization Extension API
+  :<|> 
+    ( doGetAllRoles
+    :<|> doPatchUserRoles
+    )
+  -- -- * UserProfile API 
+  :<|> doGetUserinfo 
+  ) 
   :<|> 
   -- -- * Management API
   ( 
@@ -70,14 +81,44 @@ deleteUser domain token userId =
 
 -- | Manage permissions through: 
 -- | Dashboard > API > Auth0 Management API > Machine to Machine Applications
-requestClientToken :: ConnectionInfo -> Auth0ApiResponse ClientToken
-requestClientToken ConnectionInfo{..} = do 
+requestClientCredentialsToken :: ConnectionInfo -> Auth0ApiResponse ClientToken
+requestClientCredentialsToken connInfo = do 
+  requestClientToken connInfo mkClientCredentialsRequest
+
+requestAuthorizationToken :: ConnectionInfo -> Text -> Auth0ApiResponse ClientToken
+requestAuthorizationToken connInfo redirectUrl = do 
+  requestClientToken connInfo (mkAuthorizationCodeRequest redirectUrl)
+
+requestClientToken :: 
+  ConnectionInfo 
+  -> (Text -> Text -> Text -> ClientCredentialsRequest) -- ^ client_id -> client_secret -> audience. grant_type has been set  
+  -> Auth0ApiResponse ClientToken
+requestClientToken ConnectionInfo{..} clientCredentialsRequest = do
   manager' <- newManager tlsManagerSettings
-  let clientCreds = defaultClientCredentialsRequest (Enc8.decodeUtf8 cClientId) (Enc8.decodeUtf8 cClientSecret) ("https://" <> cDomain <> "/api/v2/")
+  let clientCreds = clientCredentialsRequest (Enc8.decodeUtf8 cClientId) (Enc8.decodeUtf8 cClientSecret) ("https://" <> cDomain <> "/api/v2/")
   runClientM (doPostClientToken clientCreds) (ClientEnv manager' (BaseUrl Https (T.unpack cDomain) 443 ""))
 
+-- -- * Authentication > Authorization Extension API
+
+getAllRoles :: 
+  ConnectionInfo
+  -> AccessToken
+  -> Auth0ApiResponse Roles
+getAllRoles conn token = 
+  withToken conn token (\mToken -> doGetAllRoles mToken)
+
+addRoles :: 
+  ConnectionInfo -- ^ See https://auth0.com/docs/api/authorization-extension#find-your-extension-url
+                 --   Ex. https://xyz.eu.webtask.io/adf6e...01/api
+  -> AccessToken
+  -> Text -- ^ User Id
+  -> PatchUserRolesBody -- ^ [ "{role_id}" ]
+  -> Auth0ApiResponse ()
+addRoles conn token userId body = 
+  withToken conn token (\mToken -> doPatchUserRoles mToken userId body)
+
 -- -- * Authentication > Profile API
-getUserInfo :: Text -> AccessToken -> IO (Either ServantError UserInfo)
+getUserInfo :: Text -> AccessToken -> Auth0ApiResponse UserInfo
 getUserInfo domain token =  
   withToken (defaultConnectionInfo domain) token (\mToken -> doGetUserinfo mToken)
 
@@ -89,4 +130,4 @@ withToken :: ConnectionInfo -> AccessToken -> (Maybe Token -> ClientM a) -> Auth
 withToken ConnectionInfo{..} token f = do
   manager' <- newManager tlsManagerSettings
   let authToken = Just $ mkToken token
-  runClientM (f authToken) (ClientEnv manager' (BaseUrl cScheme (T.unpack cDomain) cPort ""))
+  runClientM (f authToken) (ClientEnv manager' (BaseUrl cScheme (T.unpack cDomain) cPort (T.unpack cPath)))

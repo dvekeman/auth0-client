@@ -15,6 +15,7 @@ data ClientToken = ClientToken
   , scope        :: Text
   , expires_in   :: Int
   , token_type   :: Text
+  , id_token     :: Maybe Text
   } deriving (Eq, Show, Generic)
 instance ToJSON ClientToken where 
   toJSON = genericToJSON defaultOptions
@@ -23,7 +24,7 @@ instance FromJSON ClientToken where
   parseJSON = genericParseJSON defaultOptions
     { omitNothingFields = True }
 
-mkClientToken :: Text -> Text -> Int -> Text -> ClientToken
+mkClientToken :: Text -> Text -> Int -> Text -> Maybe Text -> ClientToken
 mkClientToken = ClientToken
 
 accessToken :: ClientToken -> BS.ByteString

@@ -8,6 +8,7 @@ data ConnectionInfo = ConnectionInfo
   { cDomain :: Text
   , cScheme :: Scheme
   , cPort :: Int
+  , cPath :: Text
   , cClientId :: ByteString
   , cClientSecret :: ByteString
   }
@@ -18,5 +19,6 @@ defaultConnectionInfo cDomain =
     cDomain
     Https
     443
+    ""
     ""
     ""
