@@ -4,4 +4,4 @@ module Auth0.Internal.Types.Authentication.AuthorizationExtension.Types
   ) where
 
 import Auth0.Internal.Types.Authentication.AuthorizationExtension.PatchUserRolesBody (PatchUserRolesBody(..))
-import Auth0.Internal.Types.Authentication.AuthorizationExtension.Roles (Roles, Role)
+import Auth0.Internal.Types.Authentication.AuthorizationExtension.Roles (Roles(..), Role(..))
