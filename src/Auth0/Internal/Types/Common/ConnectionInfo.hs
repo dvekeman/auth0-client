@@ -11,7 +11,7 @@ data ConnectionInfo = ConnectionInfo
   , cPath :: Text
   , cClientId :: ByteString
   , cClientSecret :: ByteString
-  }
+  } deriving Show
 
 defaultConnectionInfo :: Text -> ConnectionInfo
 defaultConnectionInfo cDomain = 
