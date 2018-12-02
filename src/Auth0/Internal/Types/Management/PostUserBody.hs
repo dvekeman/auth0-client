@@ -4,6 +4,7 @@ module Auth0.Internal.Types.Management.PostUserBody where
 
 import           Data.Aeson (ToJSON, FromJSON, toJSON, parseJSON, genericToJSON, genericParseJSON, defaultOptions)
 import           Data.Aeson.Types (omitNothingFields)
+import qualified Data.Map.Strict as M
 import           Data.Text (Text)
 
 import qualified Auth0.Internal.Types.Management.UserMetadata as UM
@@ -20,8 +21,8 @@ data PostUserBody = PostUserBody
   , verify_email :: Maybe Bool
   , username :: Maybe Text
   , password :: Maybe Text
-  , user_metadata :: Maybe UM.UserMetadata
-  , app_metadata :: Maybe AM.AppMetadata
+  , user_metadata :: M.Map String String
+  , app_metadata :: M.Map String String
   , connection :: Text
   } deriving (Eq, Show, Generic)
 instance ToJSON PostUserBody where 
@@ -41,6 +42,6 @@ defaultPostUserBody = PostUserBody
   Nothing
   Nothing
   Nothing
-  Nothing
-  Nothing
+  M.empty
+  M.empty
  
