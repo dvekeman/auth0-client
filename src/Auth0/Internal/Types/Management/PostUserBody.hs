@@ -21,8 +21,8 @@ data PostUserBody = PostUserBody
   , verify_email :: Maybe Bool
   , username :: Maybe Text
   , password :: Maybe Text
-  , user_metadata :: M.Map String String
-  , app_metadata :: M.Map String String
+  , user_metadata :: M.Map Text Text
+  , app_metadata :: M.Map Text Text
   , connection :: Text
   } deriving (Eq, Show, Generic)
 instance ToJSON PostUserBody where 
