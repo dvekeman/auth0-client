@@ -4,11 +4,10 @@ module Auth0.Internal.Types.Management.User where
 
 import           Data.Aeson (ToJSON, FromJSON, toJSON, parseJSON, genericToJSON, genericParseJSON, defaultOptions)
 import           Data.Aeson.Types (omitNothingFields)
+import qualified Data.Map.Strict as M
 import           Data.Text (Text)
 
 import qualified Auth0.Internal.Types.Management.UserIdentity as I
-import qualified Auth0.Internal.Types.Management.UserMetadata as UM
-import qualified Auth0.Internal.Types.Management.AppMetadata as AM
 
 import           GHC.Generics
 
@@ -22,8 +21,8 @@ data User = User
   , created_at :: Maybe Text
   , updated_at :: Maybe Text
   , identities :: [ I.UserIdentity ]
-  , app_metadata :: Maybe AM.AppMetadata
-  , user_metadata :: Maybe UM.UserMetadata
+  , app_metadata :: Maybe (M.Map Text Text)
+  , user_metadata :: Maybe (M.Map Text Text)
   , picture :: Maybe Text
   , name :: Maybe Text
   , nickname :: Maybe Text
