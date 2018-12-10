@@ -21,6 +21,8 @@ import Auth0.Internal.ApiClient
   , requestClientCredentialsToken
   , requestAuthorizationToken
   -- -- * Authorization Extension
+  , getAllGroups
+  , getAllGroupMembers
   , getAllRoles
   , addRoles
   -- -- * Profile

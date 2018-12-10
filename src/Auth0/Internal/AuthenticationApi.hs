@@ -26,8 +26,12 @@ type AuthorizationApi =
 --           :> QueryParam "client_id" Text 
 
 type AuthorizationExtensionApi = 
+  -- GET /groups
+  Header "Authorization" Token :> "groups" :> Get '[JSON] Groups
+  -- GET /groups/<group_id>/members
+  :<|> Header "Authorization" Token :> "groups" :> Capture "group_id" Text :> "members" :> Get '[JSON] GroupMembers
   -- GET /users/roles
-  Header "Authorization" Token :> "roles" :> Get '[JSON] Roles
+  :<|> Header "Authorization" Token :> "roles" :> Get '[JSON] Roles
   -- PATCH /users/{user_id}/roles
   :<|> Header "Authorization" Token :> "users" :> Capture "user_id" Text :> "roles" :> ReqBody '[JSON] PatchUserRolesBody :> Patch '[JSON] () 
 

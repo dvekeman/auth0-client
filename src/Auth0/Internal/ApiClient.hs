@@ -16,6 +16,8 @@ import           Auth0.Internal.Api
 doPostClientToken :: ClientCredentialsRequest -> ClientM ClientToken
 -- doAuthorize :: Text -> Text -> Text -> Text -> ClientM 
 -- -- * Authorization Extension API
+doGetAllGroups :: Maybe Token -> ClientM Groups
+doGetAllGroupMembers :: Maybe Token -> Text -> ClientM GroupMembers
 doGetAllRoles :: Maybe Token -> ClientM Roles
 doPatchUserRoles :: Maybe Token -> Text -> PatchUserRolesBody -> ClientM ()
 -- -- * UserProfile API
@@ -34,7 +36,9 @@ doDeleteUser :: Maybe Token -> Text -> ClientM ()
   ( doPostClientToken
   -- -- * Authorization Extension API
   :<|> 
-    ( doGetAllRoles
+    ( doGetAllGroups
+    :<|> doGetAllGroupMembers
+    :<|> doGetAllRoles
     :<|> doPatchUserRoles
     )
   -- -- * UserProfile API 
@@ -99,6 +103,21 @@ requestClientToken ConnectionInfo{..} clientCredentialsRequest = do
   runClientM (doPostClientToken clientCreds) (ClientEnv manager' (BaseUrl Https (T.unpack cDomain) 443 ""))
 
 -- -- * Authentication > Authorization Extension API
+
+getAllGroups :: 
+  ConnectionInfo
+  -> AccessToken
+  -> Auth0ApiResponse Groups
+getAllGroups conn token = 
+  withToken conn token (\mToken -> doGetAllGroups mToken)
+
+getAllGroupMembers :: 
+  ConnectionInfo
+  -> AccessToken
+  -> Text
+  -> Auth0ApiResponse GroupMembers
+getAllGroupMembers conn token groupId = 
+  withToken conn token (\mToken -> doGetAllGroupMembers mToken groupId)
 
 getAllRoles :: 
   ConnectionInfo
