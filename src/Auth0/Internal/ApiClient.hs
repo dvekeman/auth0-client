@@ -47,7 +47,7 @@ doDeleteUser :: Maybe Token -> Text -> ClientM ()
   :<|> 
   -- -- * Management API
   ( 
-   ( doGetConnections :<|> doGetUsers :<|> doGetUser :<|> doPostUser :<|> doPatchUser :<|> doDeleteUser )
+   doGetConnections :<|> doGetUsers :<|> doGetUser :<|> doPostUser :<|> doPatchUser :<|> doDeleteUser
   ) 
  ) = client api
 
@@ -65,20 +65,17 @@ getUsers domain token =
   withToken (defaultConnectionInfo domain) token doGetUsers
 
 getUser :: Text -> AccessToken -> Text -> Auth0ApiResponse User
-getUser domain token userId = 
-  withToken (defaultConnectionInfo domain) token (\mToken -> doGetUser mToken userId)
+getUser domain token userId = withToken (defaultConnectionInfo domain) token (`doGetUser` userId)
 
 createUser :: Text -> AccessToken -> PostUserBody -> Auth0ApiResponse User
-createUser domain token body =
-  withToken (defaultConnectionInfo domain) token (\mToken -> doPostUser mToken body)
+createUser domain token body = withToken (defaultConnectionInfo domain) token (`doPostUser` body)
 
 updateUser :: Text -> AccessToken -> Text -> PatchUserBody -> Auth0ApiResponse User
 updateUser domain token userId body =
   withToken (defaultConnectionInfo domain) token (\mToken -> doPatchUser mToken userId body)
 
 deleteUser :: Text -> AccessToken -> Text -> Auth0ApiResponse ()
-deleteUser domain token userId = 
-  withToken (defaultConnectionInfo domain) token (\mToken -> doDeleteUser mToken userId)
+deleteUser domain token userId = withToken (defaultConnectionInfo domain) token (`doDeleteUser` userId)
 
 -- * Authentication API
 -- -- * Authentication > Authorization API
@@ -86,11 +83,11 @@ deleteUser domain token userId =
 -- | Manage permissions through: 
 -- | Dashboard > API > Auth0 Management API > Machine to Machine Applications
 requestClientCredentialsToken :: ConnectionInfo -> Auth0ApiResponse ClientToken
-requestClientCredentialsToken connInfo = do 
+requestClientCredentialsToken connInfo = 
   requestClientToken connInfo mkClientCredentialsRequest
 
 requestAuthorizationToken :: ConnectionInfo -> Text -> Auth0ApiResponse ClientToken
-requestAuthorizationToken connInfo redirectUrl = do 
+requestAuthorizationToken connInfo redirectUrl = 
   requestClientToken connInfo (mkAuthorizationCodeRequest redirectUrl)
 
 requestClientToken :: 
@@ -108,23 +105,20 @@ getAllGroups ::
   ConnectionInfo
   -> AccessToken
   -> Auth0ApiResponse Groups
-getAllGroups conn token = 
-  withToken conn token (\mToken -> doGetAllGroups mToken)
+getAllGroups conn token = withToken conn token doGetAllGroups
 
 getAllGroupMembers :: 
   ConnectionInfo
   -> AccessToken
   -> Text
   -> Auth0ApiResponse GroupMembers
-getAllGroupMembers conn token groupId = 
-  withToken conn token (\mToken -> doGetAllGroupMembers mToken groupId)
+getAllGroupMembers conn token groupId = withToken conn token (`doGetAllGroupMembers` groupId)
 
 getAllRoles :: 
   ConnectionInfo
   -> AccessToken
   -> Auth0ApiResponse Roles
-getAllRoles conn token = 
-  withToken conn token (\mToken -> doGetAllRoles mToken)
+getAllRoles conn token = withToken conn token doGetAllRoles
 
 addRoles :: 
   ConnectionInfo -- ^ See https://auth0.com/docs/api/authorization-extension#find-your-extension-url
@@ -138,8 +132,7 @@ addRoles conn token userId body =
 
 -- -- * Authentication > Profile API
 getUserInfo :: Text -> AccessToken -> Auth0ApiResponse UserInfo
-getUserInfo domain token =  
-  withToken (defaultConnectionInfo domain) token (\mToken -> doGetUserinfo mToken)
+getUserInfo domain token = withToken (defaultConnectionInfo domain) token doGetUserinfo
 
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --
 -- Helper
