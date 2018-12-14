@@ -11,9 +11,9 @@ import           GHC.Generics
 data ClientCredentialsRequest = ClientCredentialsRequest 
   { grant_type :: Text
   , redirect_uri :: Maybe Text
+  , audience :: Text
   , client_id  :: Text -- Ideally ByteString (no ToJSON)
   , client_secret :: Text -- Ideally ByteString (no ToJSON)
-  , audience :: Text
   } deriving (Eq, Show, Generic)
 instance ToJSON ClientCredentialsRequest where 
   toJSON = genericToJSON defaultOptions

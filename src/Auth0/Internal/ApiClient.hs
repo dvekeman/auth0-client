@@ -83,21 +83,21 @@ deleteUser domain token userId = withToken (defaultConnectionInfo domain) token 
 -- | Manage permissions through: 
 -- | Dashboard > API > Auth0 Management API > Machine to Machine Applications
 requestClientCredentialsToken :: ConnectionInfo -> Auth0ApiResponse ClientToken
-requestClientCredentialsToken connInfo = 
-  requestClientToken connInfo mkClientCredentialsRequest
+requestClientCredentialsToken connInfo@ConnectionInfo{..} = 
+  requestClientToken connInfo (mkClientCredentialsRequest cAudience) 
 
 requestAuthorizationToken :: ConnectionInfo -> Text -> Auth0ApiResponse ClientToken
-requestAuthorizationToken connInfo redirectUrl = 
-  requestClientToken connInfo (mkAuthorizationCodeRequest redirectUrl)
+requestAuthorizationToken connInfo@ConnectionInfo{..} redirectUrl = 
+  requestClientToken connInfo (mkAuthorizationCodeRequest redirectUrl cAudience)
 
 requestClientToken :: 
   ConnectionInfo 
-  -> (Text -> Text -> Text -> ClientCredentialsRequest) -- ^ client_id -> client_secret -> audience. grant_type has been set  
+  -> (Text -> Text -> ClientCredentialsRequest) -- ^ client_id -> client_secret. grant_type has been set  
   -> Auth0ApiResponse ClientToken
 requestClientToken ConnectionInfo{..} clientCredentialsRequest = do
   manager' <- newManager tlsManagerSettings
-  let clientCreds = clientCredentialsRequest (Enc8.decodeUtf8 cClientId) (Enc8.decodeUtf8 cClientSecret) ("https://" <> cDomain <> "/api/v2/")
-  runClientM (doPostClientToken clientCreds) (ClientEnv manager' (BaseUrl Https (T.unpack cDomain) 443 ""))
+  let clientCreds = clientCredentialsRequest (Enc8.decodeUtf8 cClientId) (Enc8.decodeUtf8 cClientSecret)
+  runClientM (doPostClientToken clientCreds) (ClientEnv manager' (BaseUrl Https (T.unpack cAuthDomain) 443 ""))
 
 -- -- * Authentication > Authorization Extension API
 
@@ -142,4 +142,4 @@ withToken :: ConnectionInfo -> AccessToken -> (Maybe Token -> ClientM a) -> Auth
 withToken ConnectionInfo{..} token f = do
   manager' <- newManager tlsManagerSettings
   let authToken = Just $ mkToken token
-  runClientM (f authToken) (ClientEnv manager' (BaseUrl cScheme (T.unpack cDomain) cPort (T.unpack cPath)))
+  runClientM (f authToken) (ClientEnv manager' (BaseUrl cScheme (T.unpack cReqDomain) cPort (T.unpack cPath)))
