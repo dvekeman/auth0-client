@@ -1,7 +1,6 @@
 module Auth0.Internal.ApiClient where
 
 import qualified Data.ByteString as BS
-import           Data.Monoid ( (<>) )
 import           Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as Enc8
@@ -31,6 +30,7 @@ doGetUser :: Maybe Token -> Text -> ClientM User
 doPostUser :: Maybe Token -> PostUserBody -> ClientM User
 doPatchUser :: Maybe Token -> Text -> PatchUserBody -> ClientM User
 doDeleteUser :: Maybe Token -> Text -> ClientM ()
+doGetUsersByEmail :: Maybe Token -> Maybe Text -> ClientM [User]
 ( 
   -- -- * Authorization API
   ( doPostClientToken
@@ -47,7 +47,7 @@ doDeleteUser :: Maybe Token -> Text -> ClientM ()
   :<|> 
   -- -- * Management API
   ( 
-   doGetConnections :<|> doGetUsers :<|> doGetUser :<|> doPostUser :<|> doPatchUser :<|> doDeleteUser
+   doGetConnections :<|> doGetUsers :<|> doGetUser :<|> doPostUser :<|> doPatchUser :<|> doDeleteUser :<|> doGetUsersByEmail
   ) 
  ) = client api
 
@@ -76,6 +76,9 @@ updateUser domain token userId body =
 
 deleteUser :: Text -> AccessToken -> Text -> Auth0ApiResponse ()
 deleteUser domain token userId = withToken (defaultConnectionInfo domain) token (`doDeleteUser` userId)
+
+getUsersByEmail :: Text -> AccessToken -> Text -> Auth0ApiResponse [User]
+getUsersByEmail domain token email = withToken (defaultConnectionInfo domain) token (`doGetUsersByEmail` (Just email))
 
 -- * Authentication API
 -- -- * Authentication > Authorization API

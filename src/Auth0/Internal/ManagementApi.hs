@@ -29,3 +29,5 @@ type UsersApi =
   :<|> Header "Authorization" Token :> "api" :> "v2" :> "users" :> Capture "id" Text :> ReqBody '[JSON] PatchUserBody :> Patch '[JSON] User
   -- DELETE /api/v2/users/{id} Delete a user
   :<|> Header "Authorization" Token :> "api" :> "v2" :> "users" :> Capture "id" Text :> Delete '[JSON] ()
+  -- GET /api/v2/users-by-email Search a user by email 
+  :<|> Header "Authorization" Token :> "api" :> "v2" :> "users-by-email" :> QueryParam "email" Text :> Get '[JSON] [User]
