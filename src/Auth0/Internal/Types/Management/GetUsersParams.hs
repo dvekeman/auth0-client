@@ -20,7 +20,7 @@ defaultGetUsersParams =
   GetUsersParams
     { perPage = Nothing
     , page = Nothing
-    , includeTotals = Nothing
+    , includeTotals = Just True
     , sort = Nothing
     , connection = Nothing
     , fields = Nothing
