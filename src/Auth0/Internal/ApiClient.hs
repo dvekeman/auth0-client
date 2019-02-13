@@ -10,6 +10,8 @@ import           Servant.Client (runClientM, ClientEnv(..), ServantError, Scheme
 
 import           Auth0.Internal.Api
 
+import Debug.Trace
+
 -- * Authentication API
 -- -- * Authorization API
 doPostClientToken :: ClientCredentialsRequest -> ClientM ClientToken
@@ -25,7 +27,18 @@ doGetUserinfo :: Maybe Token -> ClientM UserInfo
 -- -- * Connections API
 doGetConnections :: Maybe Token -> ClientM [Connection]
 -- -- * Users API
-doGetUsers :: Maybe Token -> ClientM [User]
+doGetUsers ::
+  Maybe Token
+  -> Maybe Int -- ^ per_page
+  -> Maybe Int -- ^ page
+  -> Maybe Bool -- ^ include_totals
+  -> Maybe Text -- ^ sort
+  -> Maybe Text -- ^ connection
+  -> Maybe Text -- ^ fields
+  -> Maybe Bool -- ^ include_fields
+  -> Maybe Text -- ^ q
+  -> Maybe Text -- ^ search_engine
+  -> ClientM GetUsersResponse
 doGetUser :: Maybe Token -> Text -> ClientM User
 doPostUser :: Maybe Token -> PostUserBody -> ClientM User
 doPatchUser :: Maybe Token -> Text -> PatchUserBody -> ClientM User
@@ -60,9 +73,30 @@ getConnections :: Text -> AccessToken -> Auth0ApiResponse [Connection]
 getConnections domain token = withToken (defaultConnectionInfo domain) token doGetConnections 
 
 -- -- * Management > Users API
+
 getUsers :: Text -> AccessToken -> Auth0ApiResponse [User]
-getUsers domain token =
-  withToken (defaultConnectionInfo domain) token doGetUsers
+getUsers domain token = do
+  response <- getUsersWithParams domain token defaultGetUsersParams
+  case response of
+    Left err -> return $ Left err
+    Right GetUsersResponse{..} -> return $ Right users
+
+getUsersWithParams :: Text -> AccessToken -> GetUsersParams -> Auth0ApiResponse GetUsersResponse
+getUsersWithParams domain token params@GetUsersParams{..} =
+  trace ("/users with params '" ++ show params ++ "''") $
+  withToken (defaultConnectionInfo domain) token
+    ( \token_ ->
+        doGetUsers  token_
+                    perPage
+                    page
+                    includeTotals
+                    sort
+                    connection
+                    fields
+                    includeFields
+                    q
+                    searchEngine
+    )
 
 getUser :: Text -> AccessToken -> Text -> Auth0ApiResponse User
 getUser domain token userId = withToken (defaultConnectionInfo domain) token (`doGetUser` userId)

@@ -20,7 +20,17 @@ type ConnectionApi =
 
 type UsersApi = 
   -- GET /api/v2/users List or search users
-  Header "Authorization" Token :> "api" :> "v2" :> "users" :> Get '[JSON] [User] 
+  Header "Authorization" Token :> "api" :> "v2" :> "users"
+    :> QueryParam "per_page" Int
+    :> QueryParam "page" Int
+    :> QueryParam "include_totals" Bool
+    :> QueryParam "sort" Text
+    :> QueryParam "connection" Text
+    :> QueryParam "fields" Text
+    :> QueryParam "include_fields" Bool
+    :> QueryParam "q" Text
+    :> QueryParam "search_engine" Text
+    :> Get '[JSON] GetUsersResponse
   -- GET /api/v2/user/{id} Get a user
   :<|> Header "Authorization" Token :> "api" :> "v2" :> "users" :> Capture "id" Text :> Get '[JSON] User 
   -- POST /api/v2/users Create a user
