@@ -16,7 +16,7 @@ category:            Web
 description:         Please see the README on GitHub at <https://github.com/dvekeman/auth0-client#readme>
 
 dependencies:
-- base >= 4.7 && < 5
+- base >= 4.7
 - aeson
 - bytestring
 - containers
@@ -24,7 +24,8 @@ dependencies:
 - http-client-tls
 - mtl
 - servant
-- servant-client 
+- servant-client
+- servant-client-core
 - text
 
 library:

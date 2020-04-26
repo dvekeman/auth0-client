@@ -6,7 +6,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as Enc8
 import           Network.HTTP.Client (newManager)
 import           Network.HTTP.Client.TLS (tlsManagerSettings)
-import           Servant.Client (runClientM, ClientEnv(..), ServantError, Scheme(..), BaseUrl(..))
+import           Servant.Client (runClientM, ClientError, Scheme(..), BaseUrl(..))
 
 import           Auth0.Internal.Api
 
@@ -65,7 +65,7 @@ doGetUsersByEmail :: Maybe Token -> Maybe Text -> ClientM [User]
  ) = client api
 
 type AccessToken = BS.ByteString
-type Auth0ApiResponse a = IO (Either ServantError a)
+type Auth0ApiResponse a = IO (Either ClientError a)
 
 -- * Management API
 -- -- * Management > Connections API
@@ -134,7 +134,7 @@ requestClientToken ::
 requestClientToken ConnectionInfo{..} clientCredentialsRequest = do
   manager' <- newManager tlsManagerSettings
   let clientCreds = clientCredentialsRequest (Enc8.decodeUtf8 cClientId) (Enc8.decodeUtf8 cClientSecret)
-  runClientM (doPostClientToken clientCreds) (ClientEnv manager' (BaseUrl Https (T.unpack cAuthDomain) 443 ""))
+  runClientM (doPostClientToken clientCreds) (mkClientEnv manager' (BaseUrl Https (T.unpack cAuthDomain) 443 ""))
 
 -- -- * Authentication > Authorization Extension API
 
@@ -179,4 +179,4 @@ withToken :: ConnectionInfo -> AccessToken -> (Maybe Token -> ClientM a) -> Auth
 withToken ConnectionInfo{..} token f = do
   manager' <- newManager tlsManagerSettings
   let authToken = Just $ mkToken token
-  runClientM (f authToken) (ClientEnv manager' (BaseUrl cScheme (T.unpack cReqDomain) cPort (T.unpack cPath)))
+  runClientM (f authToken) (mkClientEnv manager' (BaseUrl cScheme (T.unpack cReqDomain) cPort (T.unpack cPath)))
